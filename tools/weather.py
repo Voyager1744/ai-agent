@@ -4,21 +4,26 @@ import httpx
 
 
 class WeatherInput(BaseModel):
-    city: str = Field(..., description='City name to fetch weather for')
+    city: str = Field(..., description="City name to fetch weather for")
 
 
 class WeatherTool:
-    name = 'weather'
+    name = "weather"
     description = "Fetch current weather for a city"
 
     async def run(self, payload: WeatherInput):
         if not settings.weather_api_key:
-            return 'Weather API key not set.'
+            return "Weather API key not set."
 
         url = "https://api.openweathermap.org/data/2.5/weather"
         async with httpx.AsyncClient() as client:
             resp = await client.get(
-                url, params={"q": payload.city, "appid": settings.weather_api_key, "units": "metric"}
+                url,
+                params={
+                    "q": payload.city,
+                    "appid": settings.weather_api_key,
+                    "units": "metric",
+                },
             )
             if resp.status_code != 200:
                 return f"Error: {resp.text}"
