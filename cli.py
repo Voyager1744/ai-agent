@@ -1,7 +1,9 @@
 import structlog
 import typer
 from rich.console import Console
+from core.agent import Agent
 import logging
+import asyncio
 
 import asyncio
 from tools.weather import WeatherTool, WeatherInput
@@ -14,17 +16,15 @@ log = structlog.get_logger(__name__)
 
 @app.command()
 def chat():
-    console.print("[bold green]AI Agent CLI Chat[/bold green]")
+    console.print("[bold green]AI Agent with LLM[/bold green]")
+    agent = Agent()
+
     while True:
-        try:
-            message = input("You: ")
-            if message.lower() in {"exit", "quit"}:
-                break
-            # пока просто echo
-            log.info("user_message", message=message)
-            console.print(f"[cyan]Agent:[/cyan] {message}")
-        except KeyboardInterrupt:
+        message = input("You: ")
+        if message.lower() in {"exit", "quit"}:
             break
+        reply = asyncio.run(agent.ask(message))
+        console.print(f"[cyan]Agent:[/cyan] {reply}")
 
 
 @app.command()

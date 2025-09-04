@@ -1,13 +1,12 @@
-from core.llm import BaseLLM
-from core.config import settings
 from openai import AsyncOpenAI
+from core.config import settings
 
 
-class OpenAILLM(BaseLLM):
+class OpenAILLM:
     def __init__(self):
         self.client = AsyncOpenAI(api_key=settings.openai_api_key)
 
-    async def acomplete(self, messages, tools=None, tool_choice="auto"):
+    async def acomplete(self, messages, tools=None, tool_choice=None):
         response = await self.client.chat.completions.create(
             model="gpt-4o-mini",
             messages=messages,
