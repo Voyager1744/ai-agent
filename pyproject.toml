@@ -1,5 +1,5 @@
 [project]
-name = "ai-agent"
+name = "ai_agent"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -10,6 +10,7 @@ dependencies = [
     "pydantic>=2.11.7",
     "pydantic-settings>=2.10.1",
     "rich>=14.1.0",
+    "setuptools>=80.9.0",
     "structlog>=25.4.0",
     "typer>=0.17.3",
 ]
