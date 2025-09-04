@@ -8,7 +8,7 @@ class OpenAILLM:
 
     async def acomplete(self, messages, tools=None, tool_choice=None):
         response = await self.client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=settings.model_gpt,
             messages=messages,
             tools=tools,
             tool_choice=tool_choice,

@@ -1,4 +1,3 @@
-import asyncio
 import json
 from providers.openai_llm import OpenAILLM
 from core.promts import SYSTEM_PROMPT
@@ -10,8 +9,8 @@ class Agent:
     def __init__(self):
         self.llm = OpenAILLM()
         self.memory = Memory()
-        self.tools ={
-            'calculator': CalculatorTool(),
+        self.tools = {
+            "calculator": CalculatorTool(),
         }
 
     async def ask(self, user_message: str) -> str:

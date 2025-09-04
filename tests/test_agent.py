@@ -1,5 +1,4 @@
 import pytest
-import asyncio
 from core.agent import Agent
 
 

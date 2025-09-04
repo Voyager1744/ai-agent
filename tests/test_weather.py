@@ -1,5 +1,4 @@
 import pytest
-import asyncio
 from tools.weather import WeatherTool, WeatherInput
 
 

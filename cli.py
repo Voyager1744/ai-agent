@@ -2,10 +2,8 @@ import structlog
 import typer
 from rich.console import Console
 from core.agent import Agent
-import logging
 import asyncio
 
-import asyncio
 from tools.weather import WeatherTool, WeatherInput
 
 app = typer.Typer()

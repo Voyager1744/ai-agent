@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_renderer: str = "console"  # console | json
 
+    model_gpt: str = "gpt-4o-mini"
+
     class Config:
         env_file = ".env"
 
