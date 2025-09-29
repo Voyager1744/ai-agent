@@ -17,9 +17,16 @@ class Agent:
 
     async def ask(self, user_message: str) -> str:
         # сохраняем сообщение пользователя
-        self.memory.add("user", user_message)
+        overflow = self.memory.add("user", user_message)
 
-        # список инструментов для LLM (только первый вызов!)
+        # если переполнение — создаём резюме
+        if overflow:
+            summary = await self.summarize()
+            self.memory.messages = [
+                {"role": "system", "content": f"Краткое резюме диалога: {summary}"}
+            ] + self.memory.messages[-self.memory.max_messages :]
+
+        # список инструментов (только первый вызов!)
         tools = [
             {
                 "type": "function",
@@ -32,7 +39,7 @@ class Agent:
             for tool in self.tools.values()
         ]
 
-        # сообщения: system + вся история
+        # system + история
         messages = [{"role": "system", "content": SYSTEM_PROMPT}] + self.memory.get()
 
         # первый запрос с инструментами
@@ -41,7 +48,6 @@ class Agent:
 
         # цикл — пока LLM вызывает инструменты
         while msg.tool_calls:
-            # сохраняем assistant с tool_calls
             messages.append(msg.model_dump(exclude_none=True))
 
             for call in msg.tool_calls:
@@ -49,7 +55,6 @@ class Agent:
                 args = json.loads(call.function.arguments)
                 result = await tool.run(self._parse_input(tool, args))
 
-                # добавляем ответ инструмента
                 messages.append(
                     {
                         "role": "tool",
@@ -58,16 +63,27 @@ class Agent:
                     }
                 )
 
-            # новый запрос без tools
             response = await self.llm.acomplete(messages)
             msg = response.choices[0].message
 
-        # сохраняем ответ ассистента в память
+        # сохраняем ответ ассистента
         self.memory.add("assistant", msg.content)
         return msg.content
 
+    async def summarize(self) -> str:
+        """Делает краткое резюме истории диалога"""
+        history = "\n".join(f"{m['role']}: {m['content']}" for m in self.memory.get())
+        messages = [
+            {
+                "role": "system",
+                "content": "Ты помощник, который делает краткое резюме диалога пользователя.",
+            },
+            {"role": "user", "content": history},
+        ]
+        response = await self.llm.acomplete(messages)
+        return response.choices[0].message.content
+
     def _parse_input(self, tool, args: dict):
-        """Парсинг аргументов под конкретный инструмент"""
         if isinstance(tool, CalculatorTool):
             return CalculatorInput(**args)
         if isinstance(tool, DatetimeTool):
